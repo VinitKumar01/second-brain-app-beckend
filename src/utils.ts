@@ -33,8 +33,7 @@ async function getYouTubeTranscript(videoUrl: string): Promise<string> {
 
         return fullTranscript;
     } catch (error) {
-        //@ts-ignore
-        throw new Error(`Failed to fetch transcript: ${error.message}`);
+        throw new Error(`Failed to fetch transcript: ${error}`);
     }
 }
 
