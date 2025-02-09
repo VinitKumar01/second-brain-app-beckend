@@ -1,5 +1,6 @@
 import { YoutubeTranscript } from 'youtube-transcript';
 import gemini from './ai';
+
 export function random(len: number) {
     let options = "qwertyuioasdfghjklzxcvbnm12345678";
     let length = options.length;
