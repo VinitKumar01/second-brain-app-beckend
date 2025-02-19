@@ -4,7 +4,7 @@ import * as z from "zod";
 import {UserModel, ContentModel, LinkModel} from "../db";
 import * as jwt from "jsonwebtoken";
 import { isUser } from "../middlewares/middleware";
-import { random, summarisedVideo } from "../utils";
+import { random, summarisedVideo, tweet } from "../utils";
 import gemini from "../ai";
 
 
@@ -112,9 +112,14 @@ export const contentPostRouter = Router().post("/content",isUser, async (req, re
     const userId = req.body.id;
 
     const {link, title, tags, type} = req.body;
+    let contentSummary;
 
-    const contentSummary = await summarisedVideo(link) || 'failed to get summary';
-
+    if (type == 'youtube') {
+        contentSummary = await summarisedVideo(link) || 'failed to get summary';
+    } else if(type == 'twitter') {
+        contentSummary = await tweet(link) || 'failed to get summary';
+    }
+    
     try {
         await ContentModel.create({
             link,

@@ -1,5 +1,7 @@
 import { YoutubeTranscript } from 'youtube-transcript';
 import gemini from './ai';
+import axios from "axios";
+import * as cheerio from "cheerio";
 
 export function random(len: number) {
     let options = "qwertyuioasdfghjklzxcvbnm12345678";
@@ -57,4 +59,27 @@ function extractVideoId(url: string): string | null {
 
 export const summarisedVideo = (videoUrl:string) => getYouTubeTranscript(videoUrl)
     .then(transcript => gemini('give me summary of the following transcript in such a way firstly summarise every 250 words in detail (or summary should conclude all the words without leaving anything, it can be long) from the transcript and then merge the summary of all these 250 words sumaries into a single but long paragraph. give me only merged summary. \n\n' + transcript).then(result => result))
-    .catch(error => console.error('Error:', error.message))
+    .catch(error => console.error('Error:', error.message));
+
+
+
+async function extractTweetContent(tweetUrl: string): Promise<string | null> {
+    try {
+        const response = await axios.get("https://publish.twitter.com/oembed", {
+            params: { url: tweetUrl }
+        });
+        
+        if (response.data && response.data.html) {
+            const tweetHtml: string = response.data.html;
+            const $ = cheerio.load(tweetHtml);
+            return $("body").text().trim();
+        }
+    } catch (error) {
+        console.error("Error fetching tweet content:", error);
+    }
+    return null;
+}
+
+// Example usage
+export const tweet = (tweetUrl:string) => extractTweetContent(tweetUrl).then(content => content)
+.catch(error => console.error('Error:', error.message));
